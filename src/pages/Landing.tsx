@@ -11,26 +11,58 @@ const Landing = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-accent to-primary py-24 md:py-32">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-primary-foreground">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-              Bring Your Next Home With Confidence
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-accent to-primary py-24 md:py-32">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center text-primary-foreground">
+            <div className="mb-6 inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+              <span className="text-sm font-semibold">Your Trusted Rental Partner</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in leading-tight">
+              Bring Your Next Home
+              <span className="block bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                With Confidence
+              </span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Professional rental solutions that make finding and securing your perfect home effortless
+            
+            <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl mx-auto leading-relaxed">
+              Professional rental solutions that make finding and securing your perfect home effortless. 
+              Experience seamless service from search to move-in.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/contact">
-                <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white">
+                <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white shadow-lg hover:shadow-xl transition-all px-8 py-6 text-lg">
                   Get Started Today
                 </Button>
               </Link>
               <a href="#about">
-                <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40">
+                <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40 backdrop-blur-sm px-8 py-6 text-lg">
                   Learn More
                 </Button>
               </a>
+            </div>
+            
+            {/* Trust indicators */}
+            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm opacity-80">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+                <span>1000+ Happy Clients</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+                <span>500+ Properties</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+                <span>10+ Years Experience</span>
+              </div>
             </div>
           </div>
         </div>

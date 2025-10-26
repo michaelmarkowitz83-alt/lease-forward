@@ -44,7 +44,7 @@ const AdminPanel = () => {
   const [redirects, setRedirects] = useState<UserRedirect[]>([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [newUrl, setNewUrl] = useState("");
-  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUserEmail, setSelectedUserEmail] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -132,20 +132,37 @@ const AdminPanel = () => {
   };
 
   const handleSaveUrl = async () => {
-    if (!selectedUserId || !newUrl.trim()) {
+    if (!selectedUserEmail || !newUrl.trim()) {
       toast({
         title: "Error",
-        description: "Please provide both user and URL.",
+        description: "Please provide both email and URL.",
         variant: "destructive",
       });
       return;
     }
 
     try {
+      // First, find the user by email
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", selectedUserEmail.trim())
+        .single();
+
+      if (profileError || !profileData) {
+        toast({
+          title: "Error",
+          description: "User not found with that email address.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Now insert/update the redirect with the found user_id
       const { error } = await supabase
         .from("user_redirects")
         .upsert({
-          user_id: selectedUserId,
+          user_id: profileData.id,
           redirect_url: newUrl.trim(),
         }, {
           onConflict: "user_id",
@@ -160,7 +177,7 @@ const AdminPanel = () => {
 
       setIsDialogOpen(false);
       setNewUrl("");
-      setSelectedUserId("");
+      setSelectedUserEmail("");
       fetchRedirects();
     } catch (error: any) {
       toast({
@@ -266,17 +283,18 @@ const AdminPanel = () => {
                     <DialogHeader>
                       <DialogTitle>Add Redirect URL</DialogTitle>
                       <DialogDescription>
-                        Enter the user ID and redirect URL for the client.
+                        Enter the user email and redirect URL for the client.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 mt-4">
                       <div>
-                        <Label htmlFor="userId">User ID</Label>
+                        <Label htmlFor="userEmail">User Email</Label>
                         <Input
-                          id="userId"
-                          placeholder="Enter user ID"
-                          value={selectedUserId}
-                          onChange={(e) => setSelectedUserId(e.target.value)}
+                          id="userEmail"
+                          type="email"
+                          placeholder="user@example.com"
+                          value={selectedUserEmail}
+                          onChange={(e) => setSelectedUserEmail(e.target.value)}
                         />
                       </div>
                       <div>
