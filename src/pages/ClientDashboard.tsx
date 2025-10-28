@@ -5,7 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
-import { LogOut, FileText } from "lucide-react";
+import { LogOut, FileText, Home } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { InvoiceChart } from "@/components/dashboard/InvoiceChart";
+import { ExpenseBreakdown } from "@/components/dashboard/ExpenseBreakdown";
+
+interface Property {
+  id: string;
+  name: string;
+  address: string | null;
+}
+
+interface Invoice {
+  id: string;
+  amount: number;
+  category: string;
+  invoice_date: string;
+  vendor: string;
+}
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -13,9 +36,11 @@ const ClientDashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -25,18 +50,45 @@ const ClientDashboard = () => {
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (!session) {
         navigate("/auth");
       } else {
         fetchRedirectUrl(session.user.id);
+        fetchUserProperties(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  useEffect(() => {
+    if (selectedPropertyId) {
+      fetchInvoices(selectedPropertyId);
+      
+      // Set up realtime subscription
+      const channel = supabase
+        .channel('client-invoices')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'invoices',
+            filter: `property_id=eq.${selectedPropertyId}`
+          },
+          () => {
+            fetchInvoices(selectedPropertyId);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [selectedPropertyId]);
 
   const fetchRedirectUrl = async (userId: string) => {
     try {
@@ -55,8 +107,51 @@ const ClientDashboard = () => {
       }
     } catch (error) {
       console.error("Error:", error);
+    }
+  };
+
+  const fetchUserProperties = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_properties")
+        .select("properties(id, name, address)")
+        .eq("user_id", userId);
+
+      if (error) throw error;
+      
+      const userProperties = data?.map(item => item.properties).filter(Boolean) || [];
+      setProperties(userProperties as Property[]);
+      
+      if (userProperties.length > 0) {
+        setSelectedPropertyId((userProperties[0] as Property).id);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load your properties.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchInvoices = async (propertyId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("*")
+        .eq("property_id", propertyId)
+        .order("invoice_date", { ascending: false });
+
+      if (error) throw error;
+      setInvoices(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load invoices.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -92,6 +187,8 @@ const ClientDashboard = () => {
     );
   }
 
+  const totalExpenses = invoices.reduce((sum, inv) => sum + Number(inv.amount), 0);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-muted to-background">
       <div className="container mx-auto px-4 py-8">
@@ -100,7 +197,7 @@ const ClientDashboard = () => {
             <h1 className="text-3xl font-bold text-primary mb-2">
               Apex Renting Solutions
             </h1>
-            <p className="text-muted-foreground">Client Dashboard</p>
+            <p className="text-muted-foreground">Client Portal</p>
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
@@ -108,39 +205,72 @@ const ClientDashboard = () => {
           </Button>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          <Card className="border-2">
+        <div className="space-y-6">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-6 w-6 text-primary" />
-                Welcome, {session?.user?.email}
+                <Home className="h-6 w-6 text-primary" />
+                Your Properties
               </CardTitle>
-              <CardDescription>
-                Manage your rental agreements and documents
-              </CardDescription>
+              <CardDescription>View your rental property information and expenses</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Click the button below to create or view your lease agreement.
-                </p>
-                <Button
-                  size="lg"
-                  className="w-full bg-secondary hover:bg-secondary/90"
-                  onClick={handleCreateLease}
-                  disabled={!redirectUrl}
-                >
-                  <FileText className="mr-2 h-5 w-5" />
-                  Create Lease
-                </Button>
-                {!redirectUrl && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Your lease URL has not been configured yet. Please contact support.
+                {properties.length > 0 ? (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Select Property</label>
+                      <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a property" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {properties.map((property) => (
+                            <SelectItem key={property.id} value={property.id}>
+                              {property.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-bold">${totalExpenses.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {invoices.length} invoices
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Button
+                      size="lg"
+                      className="w-full bg-secondary hover:bg-secondary/90"
+                      onClick={handleCreateLease}
+                      disabled={!redirectUrl}
+                    >
+                      <FileText className="mr-2 h-5 w-5" />
+                      Create Lease
+                    </Button>
+                  </>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    No properties assigned yet. Please contact your administrator.
                   </p>
                 )}
               </div>
             </CardContent>
           </Card>
+
+          {selectedPropertyId && invoices.length > 0 && (
+            <>
+              <InvoiceChart invoices={invoices} />
+              <ExpenseBreakdown invoices={invoices} />
+            </>
+          )}
         </div>
       </div>
     </div>
