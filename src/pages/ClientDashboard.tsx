@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { InvoiceChart } from "@/components/dashboard/InvoiceChart";
 import { ExpenseBreakdown } from "@/components/dashboard/ExpenseBreakdown";
+import { ExpensePieChart } from "@/components/dashboard/ExpensePieChart";
+import { MonthlyComparison } from "@/components/dashboard/MonthlyComparison";
 
 interface Property {
   id: string;
@@ -295,7 +297,11 @@ const ClientDashboard = () => {
           {selectedPropertyId && invoices.length > 0 && (
             <>
               <InvoiceChart invoices={invoices} />
-              <ExpenseBreakdown invoices={invoices} />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ExpenseBreakdown invoices={invoices} />
+                <ExpensePieChart invoices={invoices} />
+              </div>
+              <MonthlyComparison invoices={invoices} />
             </>
           )}
         </div>
