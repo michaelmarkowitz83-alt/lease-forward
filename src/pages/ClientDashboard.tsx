@@ -34,7 +34,8 @@ const ClientDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [session, setSession] = useState<Session | null>(null);
-  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [leaseRedirectUrl, setLeaseRedirectUrl] = useState<string | null>(null);
+  const [reportRedirectUrl, setReportRedirectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
@@ -94,16 +95,19 @@ const ClientDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("user_redirects")
-        .select("redirect_url")
-        .eq("user_id", userId)
-        .single();
+        .select("redirect_url, redirect_type")
+        .eq("user_id", userId);
 
       if (error) {
         if (error.code !== "PGRST116") {
-          console.error("Error fetching redirect URL:", error);
+          console.error("Error fetching redirect URLs:", error);
         }
       } else if (data) {
-        setRedirectUrl(data.redirect_url);
+        const leaseRedirect = data.find((r) => r.redirect_type === "lease");
+        const reportRedirect = data.find((r) => r.redirect_type === "report");
+        
+        if (leaseRedirect) setLeaseRedirectUrl(leaseRedirect.redirect_url);
+        if (reportRedirect) setReportRedirectUrl(reportRedirect.redirect_url);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -165,12 +169,24 @@ const ClientDashboard = () => {
   };
 
   const handleCreateLease = () => {
-    if (redirectUrl) {
-      window.open(redirectUrl, "_blank");
+    if (leaseRedirectUrl) {
+      window.open(leaseRedirectUrl, "_blank");
     } else {
       toast({
         title: "No URL configured",
         description: "Please contact your administrator to set up your lease URL.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleGenerateReport = () => {
+    if (reportRedirectUrl) {
+      window.open(reportRedirectUrl, "_blank");
+    } else {
+      toast({
+        title: "No URL configured",
+        description: "Please contact your administrator to set up your report URL.",
         variant: "destructive",
       });
     }
@@ -246,15 +262,26 @@ const ClientDashboard = () => {
                       </CardContent>
                     </Card>
 
-                    <Button
-                      size="lg"
-                      className="w-full bg-secondary hover:bg-secondary/90"
-                      onClick={handleCreateLease}
-                      disabled={!redirectUrl}
-                    >
-                      <FileText className="mr-2 h-5 w-5" />
-                      Create Lease
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button
+                        size="lg"
+                        className="flex-1 bg-secondary hover:bg-secondary/90"
+                        onClick={handleCreateLease}
+                        disabled={!leaseRedirectUrl}
+                      >
+                        <FileText className="mr-2 h-5 w-5" />
+                        Create Lease
+                      </Button>
+                      <Button
+                        size="lg"
+                        className="flex-1 bg-secondary hover:bg-secondary/90"
+                        onClick={handleGenerateReport}
+                        disabled={!reportRedirectUrl}
+                      >
+                        <FileText className="mr-2 h-5 w-5" />
+                        Generate Report
+                      </Button>
+                    </div>
                   </>
                 ) : (
                   <p className="text-center text-muted-foreground py-8">

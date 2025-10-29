@@ -27,6 +27,7 @@ interface UserRedirect {
   id: string;
   user_id: string;
   redirect_url: string;
+  redirect_type: string;
   profiles: {
     email: string;
     full_name: string | null;
@@ -39,6 +40,7 @@ export const RedirectManagement = () => {
   const [searchEmail, setSearchEmail] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [selectedUserEmail, setSelectedUserEmail] = useState("");
+  const [redirectType, setRedirectType] = useState<"lease" | "report">("lease");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export const RedirectManagement = () => {
           id,
           user_id,
           redirect_url,
+          redirect_type,
           profiles (
             email,
             full_name
@@ -102,8 +105,9 @@ export const RedirectManagement = () => {
         .upsert({
           user_id: profileData.id,
           redirect_url: newUrl.trim(),
+          redirect_type: redirectType,
         }, {
-          onConflict: "user_id",
+          onConflict: "user_id,redirect_type",
         });
 
       if (error) throw error;
@@ -116,6 +120,7 @@ export const RedirectManagement = () => {
       setIsDialogOpen(false);
       setNewUrl("");
       setSelectedUserEmail("");
+      setRedirectType("lease");
       fetchRedirects();
     } catch (error: any) {
       toast({
@@ -161,7 +166,7 @@ export const RedirectManagement = () => {
       <CardHeader>
         <CardTitle>User Redirect Management</CardTitle>
         <CardDescription>
-          Configure custom lease URLs for each client
+          Configure custom lease and report URLs for each client
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -186,7 +191,7 @@ export const RedirectManagement = () => {
                 <DialogHeader>
                   <DialogTitle>Add Redirect URL</DialogTitle>
                   <DialogDescription>
-                    Enter the user email and redirect URL for the client.
+                    Enter the user email, redirect type, and URL for the client.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
@@ -199,6 +204,18 @@ export const RedirectManagement = () => {
                       value={selectedUserEmail}
                       onChange={(e) => setSelectedUserEmail(e.target.value)}
                     />
+                  </div>
+                  <div>
+                    <Label htmlFor="redirectType">Redirect Type</Label>
+                    <select
+                      id="redirectType"
+                      value={redirectType}
+                      onChange={(e) => setRedirectType(e.target.value as "lease" | "report")}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      <option value="lease">Lease</option>
+                      <option value="report">Report</option>
+                    </select>
                   </div>
                   <div>
                     <Label htmlFor="url">Redirect URL</Label>
@@ -223,6 +240,7 @@ export const RedirectManagement = () => {
                 <TableRow>
                   <TableHead>Email</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Redirect URL</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -230,7 +248,7 @@ export const RedirectManagement = () => {
               <TableBody>
                 {filteredRedirects.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
                       No redirects configured yet
                     </TableCell>
                   </TableRow>
@@ -241,6 +259,7 @@ export const RedirectManagement = () => {
                         {redirect.profiles.email}
                       </TableCell>
                       <TableCell>{redirect.profiles.full_name || "—"}</TableCell>
+                      <TableCell className="capitalize">{redirect.redirect_type}</TableCell>
                       <TableCell>
                         <a
                           href={redirect.redirect_url}

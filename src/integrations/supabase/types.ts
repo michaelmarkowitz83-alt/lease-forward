@@ -142,6 +142,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          redirect_type: string
           redirect_url: string
           updated_at: string
           user_id: string
@@ -149,6 +150,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          redirect_type?: string
           redirect_url: string
           updated_at?: string
           user_id: string
@@ -156,6 +158,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          redirect_type?: string
           redirect_url?: string
           updated_at?: string
           user_id?: string
@@ -164,7 +167,7 @@ export type Database = {
           {
             foreignKeyName: "user_redirects_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
