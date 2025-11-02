@@ -47,24 +47,24 @@ const Landing = () => {
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl ml-auto text-right text-primary-foreground">
+          <div className="max-w-4xl text-primary-foreground">
             <div className="mb-6 inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
               <span className="text-sm font-semibold">Your Trusted Rental Partner</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in leading-tight text-right">
               Bring Your Next Home
               <span className="block bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
                 With Confidence
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl ml-auto leading-relaxed">
+            <p className="text-xl md:text-2xl mb-10 opacity-90 leading-relaxed">
               Professional rental solutions that make finding and securing your perfect home effortless. 
               Experience seamless service from search to move-in.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-end items-center">
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
               <Link to="/contact">
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white shadow-lg hover:shadow-xl transition-all px-8 py-6 text-lg">
                   Get Started Today
@@ -78,7 +78,7 @@ const Landing = () => {
             </div>
             
             {/* Trust indicators */}
-            <div className="mt-12 flex flex-wrap justify-end gap-8 text-sm opacity-80">
+            <div className="mt-12 flex flex-wrap gap-8 text-sm opacity-80">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
                 <span>{isLoading ? "..." : `${clientsCount}+`} Happy Clients</span>
