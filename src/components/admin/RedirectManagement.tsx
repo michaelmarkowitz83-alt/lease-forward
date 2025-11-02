@@ -89,7 +89,7 @@ export const RedirectManagement = () => {
         .from("profiles")
         .select("id")
         .eq("email", selectedUserEmail.trim())
-        .single();
+        .maybeSingle();
 
       if (profileError || !profileData) {
         toast({
