@@ -1,11 +1,39 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Home, Shield, Clock, Users, Target, Heart, TrendingUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
 
 const Landing = () => {
+  const [clientsCount, setClientsCount] = useState(0);
+  const [propertiesCount, setPropertiesCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const [clientsResponse, propertiesResponse] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("properties").select("*", { count: "exact", head: true }),
+      ]);
+
+      setClientsCount(clientsResponse.count || 0);
+      setPropertiesCount(propertiesResponse.count || 0);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const yearsExperience = new Date().getFullYear() - 2014;
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -19,7 +47,7 @@ const Landing = () => {
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center text-primary-foreground">
+          <div className="max-w-4xl ml-auto text-right text-primary-foreground">
             <div className="mb-6 inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
               <span className="text-sm font-semibold">Your Trusted Rental Partner</span>
             </div>
@@ -31,12 +59,12 @@ const Landing = () => {
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl ml-auto leading-relaxed">
               Professional rental solutions that make finding and securing your perfect home effortless. 
               Experience seamless service from search to move-in.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-end items-center">
               <Link to="/contact">
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white shadow-lg hover:shadow-xl transition-all px-8 py-6 text-lg">
                   Get Started Today
@@ -50,18 +78,18 @@ const Landing = () => {
             </div>
             
             {/* Trust indicators */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm opacity-80">
+            <div className="mt-12 flex flex-wrap justify-end gap-8 text-sm opacity-80">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <span>1000+ Happy Clients</span>
+                <span>{isLoading ? "..." : `${clientsCount}+`} Happy Clients</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <span>500+ Properties</span>
+                <span>{isLoading ? "..." : `${propertiesCount}+`} Properties</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                <span>10+ Years Experience</span>
+                <span>{yearsExperience}+ Years Experience</span>
               </div>
             </div>
           </div>
@@ -196,15 +224,19 @@ const Landing = () => {
             {/* Stats */}
             <div className="grid md:grid-cols-3 gap-8 text-center bg-primary text-primary-foreground rounded-lg p-8 md:p-12">
               <div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">1000+</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2">
+                  {isLoading ? "..." : `${clientsCount}+`}
+                </div>
                 <div className="text-lg opacity-90">Happy Clients</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2">
+                  {isLoading ? "..." : `${propertiesCount}+`}
+                </div>
                 <div className="text-lg opacity-90">Properties</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">10+</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2">{yearsExperience}+</div>
                 <div className="text-lg opacity-90">Years Experience</div>
               </div>
             </div>
