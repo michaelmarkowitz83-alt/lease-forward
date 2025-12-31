@@ -2,94 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* 
+  Apex Renting Solutions - Luxury Design System 
+  Palette:
+  - Primary Green: hsl(154 26% 42%)
+  - Terra-cotta: hsl(14 61% 60%)
+  - Dark Background: hsl(154 30% 12%)
+  - Cream/Off-White: hsl(40 20% 97%)
 */
 
 @layer base {
   :root {
-    /* Apex Renting Solutions Branding - Darker Theme */
-    --background: 154 30% 12%;
-    --foreground: 154 15% 92%;
+    /* Light Mode - Luxurious & Clean */
+    --background: 40 20% 97%; /* Cream/Off-White */
+    --foreground: 154 30% 12%; /* Dark Green Text */
 
-    --card: 154 25% 15%;
-    --card-foreground: 154 15% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 154 30% 12%;
 
-    --popover: 154 25% 15%;
-    --popover-foreground: 154 15% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 154 30% 12%;
 
-    /* Apex Green - Primary Brand Color */
+    /* Primary Brand Color - Apex Green */
     --primary: 154 26% 42%;
-    --primary-foreground: 154 30% 12%;
-    
-    /* Coral - Accent/CTA Color */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary Brand Color - Terra-cotta */
     --secondary: 14 61% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Dark Muted Background */
-    --muted: 154 25% 18%;
-    --muted-foreground: 154 10% 65%;
+    /* Muted tones for depth */
+    --muted: 154 10% 90%;
+    --muted-foreground: 154 10% 40%;
 
-    /* Sage Green - Accent */
-    --accent: 154 21% 35%;
-    --accent-foreground: 154 15% 92%;
+    /* Accent - Sage Green */
+    --accent: 154 20% 90%;
+    --accent-foreground: 154 26% 42%;
 
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 154 20% 25%;
-    --input: 154 20% 25%;
+    --border: 154 20% 85%;
+    --input: 154 20% 85%;
     --ring: 154 26% 42%;
 
-    --radius: 0.5rem;
-
-    --sidebar-background: 154 30% 10%;
-    --sidebar-foreground: 154 15% 90%;
-    --sidebar-primary: 154 26% 42%;
-    --sidebar-primary-foreground: 154 30% 12%;
-    --sidebar-accent: 154 25% 18%;
-    --sidebar-accent-foreground: 154 15% 90%;
-    --sidebar-border: 154 20% 25%;
-    --sidebar-ring: 154 26% 42%;
+    --radius: 0.75rem; /* Slightly more rounded for modern feel */
   }
 
   .dark {
-    --background: 154 35% 8%;
-    --foreground: 154 15% 95%;
+    /* Dark Mode - Deep & Premium */
+    --background: 154 30% 12%; /* Deep Green/Black */
+    --foreground: 40 20% 97%; /* Cream Text */
 
-    --card: 154 30% 10%;
-    --card-foreground: 154 15% 95%;
+    --card: 154 30% 14%;
+    --card-foreground: 40 20% 97%;
 
-    --popover: 154 30% 10%;
-    --popover-foreground: 154 15% 95%;
+    --popover: 154 30% 14%;
+    --popover-foreground: 40 20% 97%;
 
-    --primary: 154 26% 50%;
-    --primary-foreground: 154 35% 8%;
+    --primary: 154 26% 42%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 14 61% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 154 25% 15%;
+    --muted: 154 25% 20%;
     --muted-foreground: 154 10% 70%;
 
-    --accent: 154 26% 28%;
-    --accent-foreground: 154 15% 95%;
+    --accent: 154 25% 20%;
+    --accent-foreground: 40 20% 97%;
 
-    --destructive: 0 62.8% 45%;
-    --destructive-foreground: 154 15% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 154 20% 20%;
     --input: 154 20% 20%;
-    --ring: 154 26% 50%;
-    
-    --sidebar-background: 154 35% 6%;
-    --sidebar-foreground: 154 15% 92%;
-    --sidebar-primary: 154 26% 50%;
-    --sidebar-primary-foreground: 154 35% 8%;
-    --sidebar-accent: 154 25% 12%;
-    --sidebar-accent-foreground: 154 15% 92%;
-    --sidebar-border: 154 20% 18%;
-    --sidebar-ring: 154 26% 50%;
+    --ring: 154 26% 42%;
   }
 }
 
@@ -97,8 +85,26 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-semibold;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-black/10 backdrop-blur-md border border-white/10;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }

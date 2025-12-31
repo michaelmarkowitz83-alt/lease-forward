@@ -1,102 +1,92 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
-import { useState } from "react";
-import apexLogo from "@/assets/apex-logo.png";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/#services" },
+    { name: "About", path: "/#about" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40">
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link to="/" className="flex items-center group">
-            <div className="relative">
-              <img 
-                src={apexLogo} 
-                alt="Apex Logo" 
-                className="h-12 w-auto transition-transform duration-300 group-hover:scale-105" 
-              />
-            </div>
-          </Link>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-background/80 backdrop-blur-md shadow-sm py-4"
+          : "bg-transparent py-6"
+      }`}
+    >
+      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+        <Link
+          to="/"
+          className="text-2xl font-bold text-primary tracking-tight flex items-center gap-2"
+        >
+          {/* Placeholder for Logo if needed, or just text */}
+          APEX RENTING
+        </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-1">
-            <Link 
-              to="/" 
-              className="px-4 py-2 text-foreground/80 hover:text-foreground font-medium transition-all duration-200 rounded-lg hover:bg-accent/50"
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                location.pathname === link.path
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              }`}
             >
-              Home
+              {link.name}
             </Link>
-            <a 
-              href="/#about" 
-              className="px-4 py-2 text-foreground/80 hover:text-foreground font-medium transition-all duration-200 rounded-lg hover:bg-accent/50"
-            >
-              About Us
-            </a>
-            <Link 
-              to="/contact" 
-              className="px-4 py-2 text-foreground/80 hover:text-foreground font-medium transition-all duration-200 rounded-lg hover:bg-accent/50"
-            >
-              Contact
-            </Link>
-            <Link to="/auth" className="ml-4">
-              <Button 
-                variant="default" 
-                className="bg-secondary hover:bg-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold px-6"
-              >
-                Client Login
-              </Button>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-accent/50 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <Menu className="h-6 w-6 text-foreground" />
-          </button>
+          ))}
+          <Button className="bg-secondary hover:bg-secondary/90 text-white rounded-full px-6">
+            Get Started
+          </Button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-6 space-y-2 border-t border-border/40 animate-fade-in">
-            <Link
-              to="/"
-              className="block px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/50 rounded-lg transition-all font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <a
-              href="/#about"
-              className="block px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/50 rounded-lg transition-all font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About Us
-            </a>
-            <Link
-              to="/contact"
-              className="block px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/50 rounded-lg transition-all font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Contact
-            </Link>
-            <Link to="/auth" onClick={() => setIsMenuOpen(false)} className="block pt-2">
-              <Button 
-                variant="default" 
-                className="w-full bg-secondary hover:bg-secondary/90 shadow-lg font-semibold"
-              >
-                Client Login
-              </Button>
-            </Link>
-          </div>
-        )}
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-foreground"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border p-4 flex flex-col gap-4 animate-in slide-in-from-top-5">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              {link.name}
+            </Link>
+          ))}
+          <Button className="w-full bg-secondary hover:bg-secondary/90 text-white rounded-full">
+            Get Started
+          </Button>
+        </div>
+      )}
     </nav>
   );
 };

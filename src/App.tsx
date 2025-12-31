@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
+import Layout from "./components/Layout";
 
 const queryClient = new QueryClient();
 
@@ -19,13 +20,15 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<ClientDashboard />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
