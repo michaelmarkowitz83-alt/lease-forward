@@ -40,11 +40,11 @@ const Landing = () => {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero-bg.png"
+            src="/hero-bg-v2.png"
             alt="Luxury Apartment"
-            className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+            className="w-full h-full object-cover opacity-60"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/40 to-primary/80 mix-blend-multiply"></div>
         </div>
 
         {/* Decorative background elements */}

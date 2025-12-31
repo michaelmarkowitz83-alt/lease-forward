@@ -33,10 +33,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <Link
           to="/"
-          className="text-2xl font-bold text-primary tracking-tight flex items-center gap-2"
+          className="flex items-center gap-2"
         >
-          <img src="/logo.png" alt="Apex Renting Logo" className="h-10 w-auto" />
-          <span className="hidden sm:inline-block">APEX RENTING</span>
+          <img src="/logo-transparent.png" alt="Apex Renting" className="h-16 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}
