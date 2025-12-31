@@ -37,6 +37,16 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-primary py-24 md:py-32 lg:py-40">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero-bg.png"
+            alt="Luxury Apartment"
+            className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/90"></div>
+        </div>
+
         {/* Decorative background elements */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
